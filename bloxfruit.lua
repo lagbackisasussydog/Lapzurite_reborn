@@ -1,6 +1,3 @@
--- I'm too poor to afford a quality obfuscator
--- Anyways if you want sources, go to the release page
--- Credits: me, chatgpt and remnant of the other scripts (yes i skidded)
 getgenv().lzr_dbg = false
 
 -- VARIABLES
@@ -345,12 +342,12 @@ function BringMob(target, pos)
 		local root = v:FindFirstChild("HumanoidRootPart")
 		
 		if hum and root and hum.Health > 0 and v.Name == target.Name then
+			Manipulate(v)
 			if (root.Position - target.PrimaryPart.Position).Magnitude <= LocalSettings.BringDistance then
 				Tween(root, TweenInfo.new(Player:DistanceFromCharacter(pos) / LocalSettings.BringSpeed), {CFrame = target:GetPivot()})
 			else
 				hum:MoveTo(root.Position)
 			end
-			Manipulate(v)
 		end
 	end
 end
