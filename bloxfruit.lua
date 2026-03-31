@@ -1200,7 +1200,7 @@ Tabs.Settings:Dropdown({Title = "Fast Mode (rejoin to turn off)", List = {"No ma
 		workspace.DescendantAdded:Connect(function(child)
 			task.spawn(function()
 				if child:IsA("ForceField") or child:IsA("Sparkles") or child:IsA("Smoke") or child:IsA("Fire") or child:IsA("Beam") then
-					RunService.Heartbeat:Wait()
+					game:GetService("RunService").Heartbeat:Wait()
 					child:Destroy()
 				elseif child:IsA("BasePart") then
 					child.CastShadow = false
