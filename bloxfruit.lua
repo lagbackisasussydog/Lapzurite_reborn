@@ -386,6 +386,7 @@ function BringMob(target, pos)
 		
 		if hum and root and hum.Health > 0 and v.Name == target.Name then
 			Manipulate(v)
+			sethiddenproperty(Player, "SimulationRadius", math.huge)
 			if (root.Position - target.PrimaryPart.Position).Magnitude <= LocalSettings.BringDistance then
 				TweenNoDelay(root, TweenInfo.new(Player:DistanceFromCharacter(pos) / LocalSettings.BringSpeed), {CFrame = target:GetPivot()})
 			else
