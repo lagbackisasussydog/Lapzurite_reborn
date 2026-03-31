@@ -862,7 +862,7 @@ function CheckItem(item)
 end
 
 function CheckInventory(Name)
-    for i,v in next, Modules.ReplicatedStorage.Remotes.CommF_:InvokeServer("getInventory") do
+    for i,v in next, ReplicatedStorage.Remotes.CommF_:InvokeServer("getInventory") do
         if v.Name == Name then
             return v
         end
