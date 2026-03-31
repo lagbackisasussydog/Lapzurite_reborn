@@ -376,7 +376,7 @@ end
 function getTool()
     for _, v in pairs(Player.Backpack:GetChildren()) do
         if v:IsA("Tool") and v.ToolTip == LocalSettings.Tool then
-			if Character:FindFirstChild(v.Name) == nil and Player.Backpack:FindFirstChild(v.Name)
+			if Character:FindFirstChild(v.Name) == nil and Player.Backpack:FindFirstChild(v.Name) == nil then Character:BreakJoints() end
             if Character:FindFirstChild(v.Name) then return end
             return v
         end
