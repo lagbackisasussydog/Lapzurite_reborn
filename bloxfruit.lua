@@ -349,7 +349,7 @@ function strictCompare(s, pattern)
 end
 
 function CheckNotification(content)
-	local Gui = Plr.PlayerGui:FindFirstChild("Notifications")
+	local Gui = Player.PlayerGui:FindFirstChild("Notifications")
 	for _, tmp in pairs(Gui:GetChildren()) do
 		if tmp and tmp:IsA("TextLabel") and string.find(tmp.Text, content) then
 			return true
