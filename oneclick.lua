@@ -1293,7 +1293,7 @@ AddFunction("autoSwitchFStyle", function()
 			end
 			
 			if tool.Name == v and tool.Level.Value >= 400 and money >= v["Money"] then
-				if frag <= v["Fragment"] and LocalSettings.CurrentPlace =~ "First-Seas" then
+				if frag <= v["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
 					StartFunction("autoStartRaid")
 					repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
 					StartThread("completeRaid")
