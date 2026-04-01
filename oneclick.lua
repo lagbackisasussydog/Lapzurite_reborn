@@ -1285,31 +1285,29 @@ AddFunction("autoSwitchFStyle", function()
 			end)
 		end
 	end
-	
-	while task.wait() do
-		print("getting fstyle")
-		for _, v in pairs(MeleeList) do
-			local tool = getTool()
+
+	print("getting fstyle")
+	for _, v in pairs(MeleeList) do
+		local tool = getTool()
+		
+		if tool.Name == "Combat" and money >= 150000 then
+			local npc = GetNPC(MeleeList["Black Leg"]["NPC"])
+			GetMelee(npc, v["Black Leg"]["Name"])
+		end
 			
-			if tool.Name == "Combat" and money >= 150000 then
-				local npc = GetNPC(MeleeList["Black Leg"]["NPC"])
-				GetMelee(npc, v["Black Leg"]["Name"])
+		if tool.Name == v["Name"] and tool.Level.Value >= 400 and money >= v["Money"] then
+			if frag < v["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
+				StartFunction("autoStartRaid")
+				repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
+				StartThread("completeRaid")
+			else
+				CloseThread("autoStartRaid")
+				CloseThread("completeRaid")
+				continue
 			end
-			
-			if tool.Name == v["Name"] and tool.Level.Value >= 400 and money >= v["Money"] then
-				if frag < v["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
-					StartFunction("autoStartRaid")
-					repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
-					StartThread("completeRaid")
-				else
-					CloseThread("autoStartRaid")
-					CloseThread("completeRaid")
-					continue
-				end
 				
-				local npc = GetNPC(v["NPC"])
-				GetMelee(npc, v["Name"])
-			end
+			local npc = GetNPC(v["NPC"])
+			GetMelee(npc, v["Name"])
 		end
 	end
 end)
@@ -1324,17 +1322,6 @@ AddFunction("checkFruit", function()
 	end
 end)
 
-AddFunction("autoRollFruit", function()
-	while task.wait(5) do
-		local args = {
-			"Cousin",
-			"Buy",
-			"DLCBoxData"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_"):InvokeServer(unpack(args))
-	end
-end)
-
 AddFunction("activateV3", function()
 	while task.wait(5) do
 		game.ReplicatedStorage.Remotes.CommE:FireServer("ActivateAbility")
@@ -1342,12 +1329,12 @@ AddFunction("activateV3", function()
 end)
 
 AddFunction("oneClick", function()
-	--StartFunction("autoSwitchFStyle")
-	StartFunction("addStats")
-	StartFunction("checkFruit")
-	StartFunction("autoRollFruit")
-	
 	while task.wait(.5) do
+		StartFunction("autoSwitchFStyle")
+		StartFunction("addStats")
+		StartFunction("checkFruit")
+		StartFunction("rollFruit")
+	
 		local fruit = GetFruit() or nil
 		
 		if fruit and not CheckInventory(fruit:GetAttribute("OriginalName")) then
