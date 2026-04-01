@@ -1284,7 +1284,7 @@ AddFunction("autoSwitchFStyle", function()
 			task.wait(1)
 			tries += 1
 
-			tele(npc:GetPivot())
+			Tween(PrimaryPart, TweenInfo.new(Player:DistanceFromCharacter(npc:GetPivot().Position) / LocalSettings.FSpeed, Enum.EasingStyle.Linear), {CFrame = npc:GetPivot()})
 			InvokeStyleCalls(FightingStyles[styleName])
 		until HasStyle(styleName) or tries >= 10
 
