@@ -1296,7 +1296,8 @@ AddFunction("autoSwitchFStyle", function()
 		end
 			
 		if tool.Name == v["Name"] and (tool.Level.Value >= 400 and not tool.Name == "Combat") and money >= v["Money"] then
-			if frag < v["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
+			local nxt = MeleeList[_ + 1]
+			if frag < nxt["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
 				StartFunction("autoStartRaid")
 				repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
 				StartThread("completeRaid")
@@ -1306,8 +1307,8 @@ AddFunction("autoSwitchFStyle", function()
 				continue
 			end
 				
-			local npc = GetNPC(v["NPC"])
-			GetMelee(npc, v["Name"])
+			local npc = GetNPC(nxt["NPC"])
+			GetMelee(npc, nxt["Name"])
 		end
 	end
 end)
@@ -1329,9 +1330,9 @@ AddFunction("activateV3", function()
 end)
 
 AddFunction("oneClick", function()
+	StartFunction("addStats")
 	while task.wait(.5) do
 		StartFunction("autoSwitchFStyle")
-		StartFunction("addStats")
 		StartFunction("checkFruit")
 		StartFunction("rollFruit")
 	
@@ -1418,4 +1419,5 @@ end)
 task.spawn(function()
 	ReplicatedStorage.Remotes.ChangeSetting:FireServer("CameraShake", false)
 	Buso()
+	StartThread("oneClick")
 end)
