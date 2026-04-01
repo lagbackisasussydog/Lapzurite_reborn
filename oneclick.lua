@@ -1244,71 +1244,92 @@ end)
 
 
 AddFunction("autoSwitchFStyle", function()
-	local tool = getTool()
-	local money = Player.Data.Beli.Value
-	local frag = Player.Data.Fragments.Value
-	
 	local MeleeList = {
-		["Black Leg"] = {
-			["Money"] = 150000,
-			["Fragment"] = 0,
-			["NPC"] = "Dark Step Teacher",
-			["Name"] = "Black Leg",
+		{
+			Name = "Black Leg",
+			Money = 150000,
+			Fragment = 0,
+			NPC = "Dark Step Teacher",
 		},
-		["Electro"] = {
-			["Money"] = 500000,
-			["Fragment"] = 0,
-			["NPC"] = "Mad Scientist",
-			["Name"] = "Electro",
+		{
+			Name = "Electro",
+			Money = 500000,
+			Fragment = 0,
+			NPC = "Mad Scientist",
 		},
-		["Fishman Karate"] = {
-			["Money"] = 750000,
-			["Fragment"] = 0,
-			["NPC"] = "Water Kung-fu Teacher",
-			["Name"] = "Fishman Karate",
+		{
+			Name = "Fishman Karate",
+			Money = 750000,
+			Fragment = 0,
+			NPC = "Water Kung-fu Teacher",
 		},
-		["Dragon Claw"] = {
-			["Money"] = 0,
-			["Fragment"] = 1500,
-			["NPC"] = "Sabi",
-			["Name"] = "Dragon Claw",
+		{
+			Name = "Dragon Claw",
+			Money = 0,
+			Fragment = 1500,
+			NPC = "Sabi",
 		},
 	}
-	
-	local function GetMelee(npc, FStyle)
-		if npc then
-			pcall(function()
-				repeat task.wait(1)
-					Character:PivotTo(npc:GetPivot())
-					InvokeStyleCalls(FightingStyles[FStyle])
-				until Player.Backpack:FindFirstChild(FStyle) or Character:FindFirstChild(FStyle) 
-			end)
-		end
+
+	local function HasStyle(styleName)
+		return Player.Backpack:FindFirstChild(styleName) or Character:FindFirstChild(styleName)
+	end
+
+	local function GetMelee(npc, styleName)
+		if not npc then return false end
+
+		local tries = 0
+		repeat
+			task.wait(1)
+			tries += 1
+
+			Character:PivotTo(npc:GetPivot())
+			InvokeStyleCalls(FightingStyles[styleName])
+		until HasStyle(styleName) or tries >= 10
+
+		return HasStyle(styleName)
 	end
 
 	print("getting fstyle")
-	for _, v in pairs(MeleeList) do
+
+	for i, style in ipairs(MeleeList) do
 		local tool = getTool()
-		
-		if tool.Name == "Combat" and money >= 150000 then
-			local npc = GetNPC(MeleeList["Black Leg"]["NPC"])
-			GetMelee(npc, v["Black Leg"]["Name"])
+		if not tool then
+			warn("No melee tool found")
+			return
 		end
-			
-		if tool.Name == v["Name"] and (tool.Level.Value >= 400 and not tool.Name == "Combat") and money >= v["Money"] then
-			local nxt = MeleeList[_ + 1]
-			if frag < nxt["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
+
+		local money = Player.Data.Beli.Value
+		local frag = Player.Data.Fragments.Value
+		local nextStyle = MeleeList[i + 1]
+
+		-- Start progression from Combat -> Black Leg
+		if tool.Name == "Combat" and style.Name == "Black Leg" and money >= style.Money then
+			local npc = GetNPC(style.NPC)
+			GetMelee(npc, style.Name)
+			break
+		end
+
+		-- If current style mastered, move to next one
+		if tool.Name == style.Name and tool.Level.Value >= 400 and nextStyle then
+			-- Need fragments?
+			if frag < nextStyle.Fragment and LocalSettings.CurrentPlace ~= "First-Seas" then
 				StartFunction("autoStartRaid")
 				repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
 				StartThread("completeRaid")
+				return
 			else
 				CloseThread("autoStartRaid")
 				CloseThread("completeRaid")
-				continue
 			end
-				
-			local npc = GetNPC(nxt["NPC"])
-			GetMelee(npc, nxt["Name"])
+
+			-- Need money?
+			if money >= nextStyle.Money then
+				local npc = GetNPC(nextStyle.NPC)
+				GetMelee(npc, nextStyle.Name)
+			end
+
+			break
 		end
 	end
 end)
@@ -1341,7 +1362,8 @@ AddFunction("oneClick", function()
 		if fruit and not CheckInventory(fruit:GetAttribute("OriginalName")) then
 			CloseThread("autoLevel")
 			repeat task.wait(1)
-				Character:PivotTo(fruit:GetPivot())
+				Character:PivotTo(fruit.Handle:GetPivot())
+				Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 			until Player.Backpack:FindFirstChild(fruit.Name) or Character:FindFirstChild(fruit.Name)
 			ReplicatedStorage.Remotes.CommF_:InvokeServer("StoreFruit", fruit:GetAttribute("OriginalName"), fruit)
 		end
