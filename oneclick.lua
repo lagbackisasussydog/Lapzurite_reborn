@@ -869,6 +869,20 @@ function getSaber()
     end
 end
 
+function CheckUndervalueFruit()
+	local max = math.huge
+	local select = v.Name
+	for _, v in pairs(ReplicatedStorage.Remotes.CommF_:InvokeServer("getInventory")) do
+		if v.Type == "Blox Fruit" then
+			if v.Value < 1000000 and v.Value <= max then
+                max = v.Value
+                select = v.Name
+            end
+		end
+	end
+	return select
+end
+
 function GetBartiloPlates()
     local Plates = workspace.Map.Dressrosa.BartiloPlates:GetChildren()
     local Select
@@ -1204,32 +1218,116 @@ AddFunction("addStats", function()
 	end
 end)
 
-AddFunction("autoSwitchFStyle", function()
-	local NpcWithMelee = {
-        ["Black Leg"] = "Dark Step Teacher",
-        ["Electro"] = "Mad Scientist",
-        ["Fishman Karate"] = "Water Kung-fu Teacher",
-        ["Dragon Claw"] = "Sabi",
-        ["Superhuman"] = "Martial Arts Master",
-        ["Dark Step"] = "Phoeyu, the Reformed",
-        ["Sharkman Karate"] = "Sharkman Teacher",
-        ["Electric Claw"] = "Previous Hero",
-        ["Dragon Talon"] = "Uzoth",
-        ["Godhuman"] = "Ancient Monk",
-        ["Sanguine Art"] = "Shafi"
-    }
+AddFunction("autoStartRaid", function()
+	if CheckNotification("loading map...") or GetRaidIsland() then return end
+    if not CheckItem("Special Microchip") then
+        if not CheckFruit() then
+            ReplicatedStorage.Remotes.CommF_:InvokeServer("LoadFruit", CheckUndervalueFruit())
+            wait(0.1)
+        else
+            ReplicatedStorage.Remotes.CommF_:InvokeServer("RaidsNpc", "Select", "Dark")
+        end
+    end
 	
-	for _, v in ipairs(NpcWithMelee) do
-		local npc = GetNPC(v)
-		Character:PivotTo(npc:GetPivot())
+	local btn
+	
+	if LocalSettings.CurrentPlace == "Second-Seas" then
+		btn = workspace.Map["CircleIsland"].RaidSummon.Button.Main.ClickDetector
+	elseif LocalSettings.CurrentPlace == "Third-Seas" then
+		btn = workspace.Map["Boat Castle"].RaidSummon2.Button.Main.ClickDetector
+	end
+	
+	if CheckItem("Special Microchip") then
+		fireclickdetector(btn)
+	end
+end)
+
+
+AddFunction("autoSwitchFStyle", function()
+	local tool = getTool()
+	local money = Player.Data.Beli.Value
+	local frag = Player.Data.Fragments.Value
+	
+	local MeleeList = {
+		["Black Leg"] = {
+			["Money"] = 150000,
+			["Fragment"] = 0,
+			["NPC"] = "Dark Step Teacher"
+		},
+		["Electro"] = {
+			["Money"] = 500000,
+			["Fragment"] = 0,
+			["NPC"] = "Mad Scientist"
+			
+		},
+		["Fishman Karate"] = {
+			["Money"] = 750000,
+			["Fragment"] = 0,
+			["NPC"] = "Water Kung-fu Teacher"
+		},
+		["Dragon Claw"] = {
+			["Money"] = 0,
+			["Fragment"] = 1500,
+			["NPC"] = "Sabi"
+		},
+	}
+	
+	local function GetMelee(npc, FStyle)
+		if npc then
+			pcall(function()
+				repeat task.wait(1)
+					Character:PivotTo(npc:GetPivot())
+					InvokeStyleCalls(FightingStyles[FStyle])
+				until Player.Backpack:FindFirstChild(FStyle) or Character:FindFirstChild(FStyle) 
+			end)
+		end
+	end
+	
+	while task.wait(5) do
+		for _, v in pairs(MeleeList) do
+			local tool = getTool()
+			
+			if tool.Name == "Combat" and money >= 150000 then
+				local npc = GetNPC(v["Black Leg"])
+				GetMelee(npc)
+			end
+			
+			if tool.Name == v and tool.Level.Value >= 400 and money >= v["Money"] then
+				if frag <= v["Fragment"] and LocalSettings.CurrentPlace =~ "First-Seas" then
+					StartFunction("autoStartRaid")
+					repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
+					StartThread("completeRaid")
+				else
+					CloseThread("autoStartRaid")
+					CloseThread("completeRaid")
+					continue
+				end
+				
+				local npc = GetNPC(v["NPC"])
+				GetMelee(npc)
+			end
+		end
 	end
 end)
 
 AddFunction("checkFruit", function()
-	local fruit = CheckItem("Fruit")
-	
-	if fruit and not CheckInventory(fruit:GetAttribute("OriginalName")) then
-		ReplicatedStorage.Remotes.CommF_:InvokeServer("StoreFruit", fruit:GetAttribute("OriginalName"), fruit)
+	while task.wait(5) do
+		local fruit = CheckItem("Fruit")
+		
+		if fruit and not CheckInventory(fruit:GetAttribute("OriginalName")) then
+			ReplicatedStorage.Remotes.CommF_:InvokeServer("StoreFruit", fruit:GetAttribute("OriginalName"), fruit)
+		end
+	end
+end)
+
+AddFunction("autoRollFruit", function()
+	while task.wait(5) do
+		local args = {
+			"Cousin",
+			"Buy",
+			"DLCBoxData"
+		}
+		game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_"):InvokeServer(unpack(args))
 	end
 end)
 
@@ -1240,7 +1338,10 @@ AddFunction("activateV3", function()
 end)
 
 AddFunction("oneClick", function()
+	StartFunction("autoSwitchFStyle")
 	StartFunction("addStats")
+	StartFunction("checkFruit")
+	StartFunction("autoRollFruit")
 	
 	while task.wait(.5) do
 		local fruit = GetFruit() or nil
@@ -1290,8 +1391,6 @@ AddFunction("oneClick", function()
 				end
 			end
 			
-			StartFunction("checkFruit")
-			StartFunction("rollFruit")
 			StartThread("autoLevel")
 		end
 		
@@ -1328,5 +1427,4 @@ end)
 task.spawn(function()
 	ReplicatedStorage.Remotes.ChangeSetting:FireServer("CameraShake", false)
 	Buso()
-	StartThread("oneClick")
 end)
