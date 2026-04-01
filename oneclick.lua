@@ -1252,23 +1252,26 @@ AddFunction("autoSwitchFStyle", function()
 		["Black Leg"] = {
 			["Money"] = 150000,
 			["Fragment"] = 0,
-			["NPC"] = "Dark Step Teacher"
+			["NPC"] = "Dark Step Teacher",
+			["Name"] = "Black Leg",
 		},
 		["Electro"] = {
 			["Money"] = 500000,
 			["Fragment"] = 0,
-			["NPC"] = "Mad Scientist"
-			
+			["NPC"] = "Mad Scientist",
+			["Name"] = "Electro",
 		},
 		["Fishman Karate"] = {
 			["Money"] = 750000,
 			["Fragment"] = 0,
-			["NPC"] = "Water Kung-fu Teacher"
+			["NPC"] = "Water Kung-fu Teacher",
+			["Name"] = "Fishman Karate",
 		},
 		["Dragon Claw"] = {
 			["Money"] = 0,
 			["Fragment"] = 1500,
-			["NPC"] = "Sabi"
+			["NPC"] = "Sabi",
+			["Name"] = "Dragon Claw",
 		},
 	}
 	
@@ -1283,16 +1286,16 @@ AddFunction("autoSwitchFStyle", function()
 		end
 	end
 	
-	while task.wait(5) do
+	while task.wait() do
 		for _, v in pairs(MeleeList) do
 			local tool = getTool()
 			
 			if tool.Name == "Combat" and money >= 150000 then
 				local npc = GetNPC(MeleeList["Black Leg"]["NPC"])
-				GetMelee(npc, "Black Leg")
+				GetMelee(npc, v["Black Leg"]["Name"])
 			end
 			
-			if tool.Name == v and tool.Level.Value >= 400 and money >= v["Money"] then
+			if tool.Name == v["Name"] and tool.Level.Value >= 400 and money >= v["Money"] then
 				if frag <= v["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
 					StartFunction("autoStartRaid")
 					repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
@@ -1304,7 +1307,7 @@ AddFunction("autoSwitchFStyle", function()
 				end
 				
 				local npc = GetNPC(v["NPC"])
-				GetMelee(npc, v)
+				GetMelee(npc, v["Name"])
 			end
 		end
 	end
