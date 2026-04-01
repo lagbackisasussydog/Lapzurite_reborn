@@ -1288,8 +1288,8 @@ AddFunction("autoSwitchFStyle", function()
 			local tool = getTool()
 			
 			if tool.Name == "Combat" and money >= 150000 then
-				local npc = GetNPC(MeleeList[1])
-				GetMelee(npc)
+				local npc = GetNPC(MeleeList["Black Leg"]["NPC"])
+				GetMelee(npc, "Black Leg")
 			end
 			
 			if tool.Name == v and tool.Level.Value >= 400 and money >= v["Money"] then
@@ -1304,7 +1304,7 @@ AddFunction("autoSwitchFStyle", function()
 				end
 				
 				local npc = GetNPC(v["NPC"])
-				GetMelee(npc)
+				GetMelee(npc, v)
 			end
 		end
 	end
