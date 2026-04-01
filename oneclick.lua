@@ -1273,7 +1273,7 @@ AddFunction("autoSwitchFStyle", function()
 		}
 
 		local function HasStyle(styleName)
-			return Player.Backpack:FindFirstChild(styleName) or Character:FindFirstChild(styleName)
+			return CheckItem(styleName)
 		end
 
 		local function GetMelee(npc, styleName)
