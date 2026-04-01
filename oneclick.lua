@@ -1277,13 +1277,14 @@ AddFunction("autoSwitchFStyle", function()
 
 	local function GetMelee(npc, styleName)
 		if not npc then return false end
-
+		
+		CloseThread("autoLevel")
 		local tries = 0
 		repeat
 			task.wait(1)
 			tries += 1
 
-			Character:PivotTo(npc:GetPivot())
+			tele(npc:GetPivot())
 			InvokeStyleCalls(FightingStyles[styleName])
 		until HasStyle(styleName) or tries >= 10
 
