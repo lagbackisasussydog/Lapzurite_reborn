@@ -24,7 +24,7 @@ local LocalSettings = {
 	["FSpeed"] = 250,
 	["BringDistance"] = 1000,
 	["BringSpeed"] = 10000,
-	["AttackDistance"] = 60,
+	["AttackDistance"] = 3500,
 	["Tool"] = "Melee",
 	["CurrentPlace"] = "",
 	["SubFarmMode"] = "",
@@ -258,6 +258,11 @@ function GetClosestEnemy()
 	end
 	
 	return closest
+end
+
+function SwitchTask(fromThread, toThread)
+	CloseThread(fromThread)
+	StartThread(toThread)
 end
 
 function GetNPC(name)
@@ -1289,7 +1294,7 @@ AddFunction("autoSwitchFStyle", function()
 				Tween(PrimaryPart, TweenInfo.new(Player:DistanceFromCharacter(npc:GetPivot().Position) / LocalSettings.FSpeed, Enum.EasingStyle.Linear), {CFrame = npc:GetPivot()})
 				InvokeStyleCalls(FightingStyles[styleName])
 			until HasStyle(styleName) or tries >= 10
-
+			
 			return HasStyle(styleName)
 		end
 
@@ -1329,10 +1334,13 @@ AddFunction("autoSwitchFStyle", function()
 				-- Need money?
 				if money >= nextStyle.Money then
 					local npc = GetNPC(nextStyle.NPC)
-					GetMelee(npc, nextStyle.Name)
+					if GetMelee(npc, nextStyle.Name) then
+						SwitchTask("autoSwitchFStyle", "oneClick")
+						return
+					end
 				end
 
-				break
+				SwitchTask("autoSwitchFStyle", "oneClick")
 			end
 		end
 	end
