@@ -1295,7 +1295,7 @@ AddFunction("autoSwitchFStyle", function()
 			GetMelee(npc, v["Black Leg"]["Name"])
 		end
 			
-		if tool.Name == v["Name"] and tool.Level.Value >= 400 and money >= v["Money"] then
+		if tool.Name == v["Name"] and (tool.Level.Value >= 400 and not tool.Name == "Combat") and money >= v["Money"] then
 			if frag < v["Fragment"] and LocalSettings.CurrentPlace ~= "First-Seas" then
 				StartFunction("autoStartRaid")
 				repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
