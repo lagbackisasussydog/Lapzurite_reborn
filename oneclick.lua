@@ -1287,6 +1287,7 @@ AddFunction("autoSwitchFStyle", function()
 	end
 	
 	while task.wait() do
+		print("getting fstyle")
 		for _, v in pairs(MeleeList) do
 			local tool = getTool()
 			
