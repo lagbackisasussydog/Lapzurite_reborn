@@ -1278,6 +1278,7 @@ AddFunction("autoSwitchFStyle", function()
 	local function GetMelee(npc, styleName)
 		if not npc then return false end
 		
+		task.wait(5)
 		CloseThread("autoLevel")
 		local tries = 0
 		repeat
