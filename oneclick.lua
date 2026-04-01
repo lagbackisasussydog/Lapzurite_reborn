@@ -371,14 +371,12 @@ function Manipulate(v)
     end
 end
 
-function SpamAllSkill()
+function CheckSkill()
     for i,v in next, Player.PlayerGui.Main.Skills:GetChildren() do
         if v:IsA("Frame") and v.Name ~= "Container" then
             for i1, v1 in next, v:GetChildren() do
                 if v1:IsA("Frame") and v1.Name ~= "Template" and v1.Cooldown.AbsoluteSize.X <= 5 and v1.Title.TextColor3 == Color3.fromRGB(255,255,255) then
-                    Character.Humanoid:EquipTool(v.Name)
-                    task.wait()
-                    SendKey(v1.Name,2)
+                    
                 end
             end
         end
@@ -461,7 +459,9 @@ function FollowEnemy(enemy, pos)
 	if enemy.Parent and hum.Health > 0 then
 		local targetCFrame = root.CFrame * CFrame.new(0, 20, 0)
 		local Tool = getTool()
-
+		
+		if Player.Backpack:FindFirstChild(Tool.Name) == nil and Character:FindFirstChild(Tool.Name) == nil then Character:BreakJoints() end
+		
 		Character.Humanoid:EquipTool(Tool)
 		
 		Tween(PrimaryPart, TweenInfo.new(Player:DistanceFromCharacter(root.Position) / LocalSettings.FSpeed, Enum.EasingStyle.Linear), {CFrame = CFrame.new(targetCFrame.Position)})
@@ -1362,6 +1362,14 @@ AddFunction("activateV3", function()
 	end
 end)
 
+AddFunction("activateVSkill", function()
+	while task.wait(40) do
+		if CheckItem("Black Leg") or CheckItem("Death Step") then
+			SendKey(Enum.Keycode.V)
+		end
+	end
+end)
+
 AddFunction("oneClick", function()
 	StartFunction("addStats")
 	StartFunction("autoSwitchFStyle")
@@ -1397,9 +1405,13 @@ AddFunction("oneClick", function()
 				if (CheckNotification("We are breaching the factory in 30 seconds!") or GetEnemyByName("Core")) then
 					local mob = GetEnemyByName("Core")
 					CloseThread("autoLevel")
-					repeat
-						FollowEnemy(mob, PrimaryPart.Position)
-					until not AreEnemiesAlive("Core")
+					if mob then
+						repeat
+							FollowEnemy(mob, PrimaryPart.Position)
+						until not AreEnemiesAlive(mob.Name)
+					else
+					
+					end
 				end
 				
 				if (CheckNotification("The power of darkness has been unleashed.") or GetEnemyByName("Darkbeard")) then
