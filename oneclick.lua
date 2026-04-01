@@ -43,7 +43,7 @@ local FightingStyles = {
     ["Black Leg"] = {
         Type = "Tool",
         Calls = {
-			{"BuyBlackLeg", true},
+			{"BuyBlackLeg"},
             {"BuyBlackLeg"}
         }
     },
@@ -51,7 +51,7 @@ local FightingStyles = {
     ["Electro"] = {
         Type = "Tool",
         Calls = {
-			{"BuyElectro", true},
+			{"BuyElectro"},
             {"BuyElectro"}
         }
     },
@@ -59,7 +59,7 @@ local FightingStyles = {
     ["Fishman Karate"] = {
         Type = "Tool",
         Calls = {
-			{"BuyFishmanKarate", true},
+			{"BuyFishmanKarate"},
             {"BuyFishmanKarate"}
         }
     },
@@ -1244,94 +1244,96 @@ end)
 
 
 AddFunction("autoSwitchFStyle", function()
-	local MeleeList = {
-		{
-			Name = "Black Leg",
-			Money = 150000,
-			Fragment = 0,
-			NPC = "Dark Step Teacher",
-		},
-		{
-			Name = "Electro",
-			Money = 500000,
-			Fragment = 0,
-			NPC = "Mad Scientist",
-		},
-		{
-			Name = "Fishman Karate",
-			Money = 750000,
-			Fragment = 0,
-			NPC = "Water Kung-fu Teacher",
-		},
-		{
-			Name = "Dragon Claw",
-			Money = 0,
-			Fragment = 1500,
-			NPC = "Sabi",
-		},
-	}
+	while task.wait() do
+		local MeleeList = {
+			{
+				Name = "Black Leg",
+				Money = 150000,
+				Fragment = 0,
+				NPC = "Dark Step Teacher",
+			},
+			{
+				Name = "Electro",
+				Money = 500000,
+				Fragment = 0,
+				NPC = "Mad Scientist",
+			},
+			{
+				Name = "Fishman Karate",
+				Money = 750000,
+				Fragment = 0,
+				NPC = "Water Kung-fu Teacher",
+			},
+			{
+				Name = "Dragon Claw",
+				Money = 0,
+				Fragment = 1500,
+				NPC = "Sabi",
+			},
+		}
 
-	local function HasStyle(styleName)
-		return Player.Backpack:FindFirstChild(styleName) or Character:FindFirstChild(styleName)
-	end
-
-	local function GetMelee(npc, styleName)
-		if not npc then return false end
-		
-		task.wait(5)
-		CloseThread("autoLevel")
-		local tries = 0
-		repeat
-			task.wait(1)
-			tries += 1
-
-			Tween(PrimaryPart, TweenInfo.new(Player:DistanceFromCharacter(npc:GetPivot().Position) / LocalSettings.FSpeed, Enum.EasingStyle.Linear), {CFrame = npc:GetPivot()})
-			InvokeStyleCalls(FightingStyles[styleName])
-		until HasStyle(styleName) or tries >= 10
-
-		return HasStyle(styleName)
-	end
-
-	print("getting fstyle")
-
-	for i, style in ipairs(MeleeList) do
-		local tool = getTool()
-		if not tool then
-			warn("No melee tool found")
-			return
+		local function HasStyle(styleName)
+			return Player.Backpack:FindFirstChild(styleName) or Character:FindFirstChild(styleName)
 		end
 
-		local money = Player.Data.Beli.Value
-		local frag = Player.Data.Fragments.Value
-		local nextStyle = MeleeList[i + 1]
+		local function GetMelee(npc, styleName)
+			if not npc then return false end
+			
+			task.wait(5)
+			CloseThread("autoLevel")
+			local tries = 0
+			repeat
+				task.wait(1)
+				tries += 1
 
-		-- Start progression from Combat -> Black Leg
-		if tool.Name == "Combat" and style.Name == "Black Leg" and money >= style.Money then
-			local npc = GetNPC(style.NPC)
-			GetMelee(npc, style.Name)
-			break
+				Tween(PrimaryPart, TweenInfo.new(Player:DistanceFromCharacter(npc:GetPivot().Position) / LocalSettings.FSpeed, Enum.EasingStyle.Linear), {CFrame = npc:GetPivot()})
+				InvokeStyleCalls(FightingStyles[styleName])
+			until HasStyle(styleName) or tries >= 10
+
+			return HasStyle(styleName)
 		end
 
-		-- If current style mastered, move to next one
-		if tool.Name == style.Name and tool.Level.Value >= 400 and nextStyle then
-			-- Need fragments?
-			if frag < nextStyle.Fragment and LocalSettings.CurrentPlace ~= "First-Seas" then
-				StartFunction("autoStartRaid")
-				repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
-				StartThread("completeRaid")
+		print("getting fstyle")
+
+		for i, style in ipairs(MeleeList) do
+			local tool = getTool()
+			if not tool then
+				warn("No melee tool found")
 				return
-			else
-				CloseThread("autoStartRaid")
-				CloseThread("completeRaid")
 			end
 
-			-- Need money?
-			if money >= nextStyle.Money then
-				local npc = GetNPC(nextStyle.NPC)
-				GetMelee(npc, nextStyle.Name)
+			local money = Player.Data.Beli.Value
+			local frag = Player.Data.Fragments.Value
+			local nextStyle = MeleeList[i + 1]
+
+			-- Start progression from Combat -> Black Leg
+			if tool.Name == "Combat" and style.Name == "Black Leg" and money >= style.Money then
+				local npc = GetNPC(style.NPC)
+				GetMelee(npc, style.Name)
+				break
 			end
 
-			break
+			-- If current style mastered, move to next one
+			if tool.Name == style.Name and tool.Level.Value >= 400 and nextStyle then
+				-- Need fragments?
+				if frag < nextStyle.Fragment and LocalSettings.CurrentPlace ~= "First-Seas" then
+					StartFunction("autoStartRaid")
+					repeat task.wait() until Player.PlayerGui.Main.TopHUDList.RaidTimer.Visible
+					StartThread("completeRaid")
+					return
+				else
+					CloseThread("autoStartRaid")
+					CloseThread("completeRaid")
+				end
+
+				-- Need money?
+				if money >= nextStyle.Money then
+					local npc = GetNPC(nextStyle.NPC)
+					GetMelee(npc, nextStyle.Name)
+				end
+
+				break
+			end
 		end
 	end
 end)
@@ -1354,8 +1356,8 @@ end)
 
 AddFunction("oneClick", function()
 	StartFunction("addStats")
+	StartFunction("autoSwitchFStyle")
 	while task.wait(.5) do
-		StartFunction("autoSwitchFStyle")
 		StartFunction("checkFruit")
 		StartFunction("rollFruit")
 	
