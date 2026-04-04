@@ -1378,12 +1378,14 @@ AddFunction("oneClick", function()
 		end
 	
 		if Player.Data.Level.Value <= 2800 then
+			--[[
 			if LocalSettings.CurrentPlace == "First-Seas" and Player.Data.Level.Value >= 200 and not (CheckItem("Saber") ~= nil or CheckInventory("Saber") ~= nil) and getgenv().GENVConf.Item.Saber then
 				st:ChangeText("Getting Saber")
 				CloseThread("autoLevel")
 				StartThread("saber")
 				repeat task.wait() until CheckItem("Saber") and CheckInventory("Saber")
 			else continue end
+			--]]
 			
 			if LocalSettings.CurrentPlace == "First-Seas" and Player.Data.Level.Value >= 700 then
 				st:ChangeText("Going to second-seas")
