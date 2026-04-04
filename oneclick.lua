@@ -1427,13 +1427,13 @@ AddFunction("healthCheck", function()
 end)
 
 AddFunction("oneClick", function()
-	StartFunction("healthCheck")
+	--StartFunction("healthCheck")
 	StartFunction("addStats")
 	--StartFunction("autoSwitchFStyle")
 	while task.wait(.5) do
 		StartFunction("checkFruit")
-		StartFunction("rollFruit")
-		StartFunction("BuyAbility")
+		--StartFunction("rollFruit")
+		--StartFunction("BuyAbility")
 	
 		local fruit = GetFruit() or nil
 		
