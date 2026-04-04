@@ -1272,10 +1272,6 @@ AddFunction("autoSwitchFStyle", function()
 
 		for i, style in ipairs(MeleeList) do
 			local tool = getTool()
-			if not tool then
-				warn("No melee tool found")
-				return
-			end
 
 			local money = Player.Data.Beli.Value
 			local frag = Player.Data.Fragments.Value
