@@ -1326,8 +1326,6 @@ AddFunction("checkFruit", function()
 		for _, v in pairs(Player.Backpack:GetChildren()) do
 			if string.find(v.Name, "fruit") and CheckInventory(v:GetAttribute("OriginalName")) then
 				continue
-			else
-				ReplicatedStorage.Remotes.CommF_:InvokeServer("StoreFruit", fruit:GetAttribute("OriginalName"), fruit)
 			end
 		end
 	end
