@@ -1345,7 +1345,7 @@ AddFunction("healthCheck", function()
 		local Hum = Character.Humanoid
 		if Hum.Health <= Hum.MaxHealth * 0.75 then
 			CloseThread("oneClick")
-			Character:PivotTo(Character:GetPivot() * CFrame.new(0,100,0))
+			Character:PivotTo(Character:GetPivot() * CFrame.new(0,-500,0))
 			repeat task.wait() until Hum.Health == Hum.MaxHealth
 			SwitchTask("healthCheck", "oneClick")
 		end
@@ -1353,24 +1353,9 @@ AddFunction("healthCheck", function()
 end)
 
 AddFunction("oneClick", function()
-	StartFunction("healthCheck")
 	StartFunction("addStats")
 	--StartFunction("autoSwitchFStyle")
-	while task.wait(.5) do
-		StartFunction("checkFruit")
-		StartFunction("rollFruit")
-	
-		local money = Player.Data.Beli.Value
-		if money >= 835000 then
-			if CheckInventory("Saber") then
-				ReplicatedStorage.Remotes.CommF_:InvokeServer("KenTalk", "Buy")
-			end
-		
-			ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyHaki", "Soru")
-			ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyHaki", "Geppo")
-			ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyHaki", "Buso")
-		end
-	
+	while task.wait() do
 		local fruit = GetFruit() or nil
 		
 		if fruit and not CheckInventory(fruit:GetAttribute("OriginalName")) then
@@ -1428,6 +1413,8 @@ AddFunction("oneClick", function()
 				end
 			end
 			
+			StartFunction("checkFruit")
+			StartFunction("rollFruit")
 			StartThread("autoLevel")
 		end
 	end
